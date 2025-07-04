@@ -1,11 +1,59 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { AuthComponent } from '../../../features/auth/auth.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
-  imports: [],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css'
+  styleUrls: ['./navbar.component.scss'],
+  standalone: true,
+  imports: [CommonModule, RouterLink,MatDialogModule]
 })
 export class NavbarComponent {
+  cartItemCount = 0;
+  isSignedIn = false;
+  isMobileMenuOpen = false;
 
+  constructor(
+    private dialog: MatDialog,
+    private authService: AuthService
+  ) {
+    this.isSignedIn = this.authService.isAuthenticated();
+    
+    this.authService.isSignedIn$.subscribe(
+      isSignedIn => this.isSignedIn = isSignedIn
+    );
+
+    if (this.isSignedIn) {
+      this.authService.loadUserProfile().subscribe();
+    }
+  }
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    document.body.classList.toggle('mobile-menu-open', this.isMobileMenuOpen);
+  }
+  signIn() {
+    const dialogRef = this.dialog.open(AuthComponent, {
+      width: '400px',
+      disableClose: false
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        console.log('Successfully signed in');
+      }
+    });
+  }
+
+  signOut() {
+    this.authService.logout();
+  }
+  
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
+    document.body.classList.remove('mobile-menu-open');
+  }
 }
