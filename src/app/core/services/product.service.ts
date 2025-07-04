@@ -72,6 +72,5 @@ export class ProductService {
   getProductById(id: number): Observable<Product> {
     return this.api.get<Product>(API_CONFIG.ENDPOINTS.PRODUCTS.DETAILS(id));
   }
-
-  // Add more methods as needed for your product operations
+  
 } 
