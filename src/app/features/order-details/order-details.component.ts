@@ -25,7 +25,7 @@ import { DomSanitizer } from '@angular/platform-browser';
     MatProgressSpinnerModule
   ],
   templateUrl: './order-details.component.html',
-  styleUrls: ['./order-details.component.scss']
+  styleUrls: ['./order-details.component.css']
 })
 export class OrderDetailsComponent implements OnInit {
   order: OrderDto | null = null;
