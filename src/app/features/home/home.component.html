@@ -1,1 +1,49 @@
-<p>home works!</p>
+<!-- src\app\features\home\home.component.html -->
+<div class="home-container">
+  <!-- Banner Carousel -->
+  <section class="banner-section">
+    <owl-carousel-o 
+      [options]="responsiveCarouselOptions" 
+      class="mobile-friendly-carousel"
+    >
+      <ng-container *ngFor="let banner of banners">
+        <ng-template carouselSlide>
+          <div 
+            class="banner-slide" 
+            [style.background-image]="'url(' + banner.image + ')'"
+          >
+            <div class="banner-content">
+              <h2>{{ banner.title }}</h2>
+              <p>{{ banner.subtitle }}</p>
+              <button class="btn btn-primary">Comprar Ahora</button>
+            </div>
+          </div>
+        </ng-template>
+      </ng-container>
+    </owl-carousel-o>
+  </section>
+
+  <section class="featured-catalogs-section">
+    <div class="section-header">
+      <h2>Compra por Categoría</h2>
+      <p>Explora nuestras colecciones seleccionadas</p>
+    </div>
+    <div class="featured-catalogs-grid">
+      <app-featured-catalog *ngFor="let catalog of featuredCatalogs" [catalog]="catalog"></app-featured-catalog>
+    </div>
+  </section>
+
+  <section class="featured-section">
+    <h2>Productos Destacados</h2>
+    <div class="featured-products">
+      <div *ngFor="let product of featuredProducts" class="featured-item">
+        <app-product-card [product]="product"></app-product-card>
+      </div>
+    </div>
+  </section>
+
+  <section class="catalog-section">
+    <h2>Los Más Vendidos</h2>
+    <app-product-catalog></app-product-catalog>
+  </section>
+</div>
