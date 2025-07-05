@@ -10,7 +10,7 @@ import { OrderDto } from '../../core/interfaces/order.interface';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './orders.component.html',
-  styleUrls: ['./orders.component.scss']
+  styleUrls: ['./orders.component.css']
 })
 export class OrderHistoryComponent implements OnInit {
   orders: OrderDto[] = [];
