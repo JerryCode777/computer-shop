@@ -1,11 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { Router, RouterModule } from '@angular/router';
+import { Product } from '../../../core/services/product.service';
 
 @Component({
   selector: 'app-product-card',
-  imports: [],
   templateUrl: './product-card.component.html',
-  styleUrl: './product-card.component.css'
+  styleUrls: ['./product-card.component.css'],
+  standalone: true,
+  imports: [CommonModule,RouterModule]
 })
 export class ProductCardComponent {
+  @Input() product!: Product;
+  constructor(private router: Router) {}
+
+  navigateToDetail(): void {
+    this.router.navigate(['/product', this.product.id]);
+  }
 
 }
