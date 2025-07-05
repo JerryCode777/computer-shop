@@ -1,1 +1,223 @@
-<p>checkout works!</p>
+<!-- Pantalla de Carga -->
+<div class="loading-state" *ngIf="loading">
+  <div class="loader"></div>
+  <p>Cargando...</p>
+</div>
+
+<!-- Contenedor del Checkout -->
+<div class="checkout-container" *ngIf="!loading">
+
+  <!-- Indicador de Progreso -->
+  <div class="checkout-progress">
+    <div class="progress-step" [class.active]="currentStep >= 1">
+      <div class="step-number">1</div>
+      <div class="step-label">Dirección de Envío</div>
+    </div>
+    <div class="progress-line" [class.active]="currentStep >= 2"></div>
+    <div class="progress-step" [class.active]="currentStep >= 2">
+      <div class="step-number">2</div>
+      <div class="step-label">Revisión del Pedido</div>
+    </div>
+  </div>
+
+  <!-- Paso 1: Selección de Dirección -->
+  <div class="checkout-step" *ngIf="currentStep === 1">
+    <div class="address-section">
+
+      <!-- Direcciones Guardadas -->
+      <div class="saved-addresses">
+        <div class="section-header">
+          <h3>Seleccionar Dirección de Envío</h3>
+          <span class="address-count">{{addresses.length}} direcciones guardadas</span>
+        </div>
+
+        <div class="address-grid">
+          <div class="address-card" *ngFor="let address of addresses"
+               [class.selected]="selectedAddress?.id === address.id"
+               (click)="selectAddress(address)">
+            <div class="selection-indicator">
+              <div class="radio-outer">
+                <div class="radio-inner" [class.active]="selectedAddress?.id === address.id"></div>
+              </div>
+            </div>
+            <div class="address-content">
+              <div class="name-badge">
+                {{address.firstName.charAt(0)}}{{address.lastName.charAt(0)}}
+              </div>
+              <div class="address-details">
+                <p class="name">{{address.firstName}} {{address.lastName}}</p>
+                <p class="street">{{address.streetAddress}}</p>
+                <p class="city-state">{{address.city}}, {{address.state}} {{address.zipCode}}</p>
+                <p class="mobile">
+                  <i class="fas fa-phone"></i> {{address.mobile}}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formulario para Nueva Dirección -->
+      <div class="new-address-section">
+        <div class="new-address-holder">
+          <div class="section-header">
+            <h3>Agregar Nueva Dirección</h3>
+          </div>
+
+          <form [formGroup]="addressForm" (ngSubmit)="addNewAddress()" class="address-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" formControlName="firstName" placeholder="Ingresa tu nombre">
+                <div class="error-message" *ngIf="addressForm.get('firstName')?.touched && addressForm.get('firstName')?.invalid">
+                  El nombre es obligatorio
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Apellido</label>
+                <input type="text" formControlName="lastName" placeholder="Ingresa tu apellido">
+                <div class="error-message" *ngIf="addressForm.get('lastName')?.touched && addressForm.get('lastName')?.invalid">
+                  El apellido es obligatorio
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Dirección</label>
+              <input type="text" formControlName="streetAddress" placeholder="Ingresa tu dirección completa">
+              <div class="error-message" *ngIf="addressForm.get('streetAddress')?.touched && addressForm.get('streetAddress')?.invalid">
+                La dirección es obligatoria
+              </div>
+            </div>
+
+            <div class="form-row three-columns">
+              <div class="form-group">
+                <label>Ciudad</label>
+                <input type="text" formControlName="city" placeholder="Ciudad">
+                <div class="error-message" *ngIf="addressForm.get('city')?.touched && addressForm.get('city')?.invalid">
+                  La ciudad es obligatoria
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Departamento</label>
+                <input type="text" formControlName="state" placeholder="Departamento">
+                <div class="error-message" *ngIf="addressForm.get('state')?.touched && addressForm.get('state')?.invalid">
+                  El departamento es obligatorio
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Código Postal</label>
+                <input type="text" formControlName="zipCode" placeholder="Código postal">
+                <div class="error-message" *ngIf="addressForm.get('zipCode')?.touched && addressForm.get('zipCode')?.invalid">
+                  Código postal obligatorio
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Celular</label>
+              <div class="phone-input">
+                <span class="country-code">+51</span>
+                <input type="tel" formControlName="mobile" placeholder="Número de celular">
+              </div>
+              <div class="error-message" *ngIf="addressForm.get('mobile')?.touched && addressForm.get('mobile')?.invalid">
+                Número de celular obligatorio
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-save" [disabled]="!addressForm.valid">
+                Guardar Dirección
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Botón Continuar -->
+      <div class="checkout-actions">
+        <button class="btn-continue" (click)="nextStep()" [disabled]="!selectedAddress">
+          <span>Continuar a Revisión del Pedido</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paso 2: Revisión del Pedido -->
+  <div class="checkout-step" *ngIf="currentStep === 2">
+    <div class="order-review">
+
+      <!-- Sección Izquierda: Productos -->
+      <div class="order-items-section">
+        <div class="section-header">
+          <h3>Resumen del Pedido</h3>
+          <span class="order-id">ID Pedido: {{order?.order_id}}</span>
+        </div>
+
+        <div class="order-items">
+          <div *ngFor="let item of order?.orderItemList" class="order-item">
+            <div class="item-image">
+              <img [src]="item.sku.product.imageUrl" [alt]="item.sku.product.title">
+            </div>
+            <div class="item-details">
+              <div class="item-info">
+                <h4>{{item.sku.product.title}}</h4>
+                <p class="brand">{{item.sku.product.brand}}</p>
+                <p class="color">Color: {{item.sku.color}}</p>
+              </div>
+              <div class="item-quantity">
+                <span>Cant: {{item.quantity}}</span>
+              </div>
+              <div class="item-price">
+                <span class="original-price">S/{{item.sku.price}}</span>
+                <span class="final-price">S/{{item.sku.discountedPrice}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección Derecha: Totales y Dirección -->
+      <div class="order-summary-section">
+        <div class="price-details">
+          <h4>Detalles de Pago</h4>
+          <div class="price-row">
+            <span>Precio ({{order?.totalItem}} items)</span>
+            <span>S/{{order?.totalPrice}}</span>
+          </div>
+          <div class="price-row discount">
+            <span>Descuento</span>
+            <span>- S/{{order?.discount}}</span>
+          </div>
+          <div class="price-row">
+            <span>Envío</span>
+            <span class="free">GRATIS</span>
+          </div>
+          <div class="price-row total">
+            <span>Total a Pagar</span>
+            <span>S/{{order?.totalDiscountedPrice}}</span>
+          </div>
+        </div>
+
+        <div class="delivery-address">
+          <h4>Dirección de Envío</h4>
+          <div class="address-details" *ngIf="order?.shippingAddress">
+            <p class="name">{{order?.shippingAddress?.firstName}} {{order?.shippingAddress?.lastName}}</p>
+            <p class="address">{{order?.shippingAddress?.streetAddress}}</p>
+            <p class="location">{{order?.shippingAddress?.city}}, {{order?.shippingAddress?.state}} - {{order?.shippingAddress?.zipCode}}</p>
+            <p class="phone">Celular: {{order?.shippingAddress?.mobile}}</p>
+          </div>
+        </div>
+
+        <div class="payment-action">
+          <button class="payment-button" routerLink="/cart">
+            <span>Proceder al Pago</span>
+            <span class="amount">S/{{order?.totalDiscountedPrice}}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
