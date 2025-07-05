@@ -1,1 +1,111 @@
-<p>order-details works!</p>
+<div class="order-details-container">
+  <!-- Estado de Carga -->
+  <div class="loading-state" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando detalles del pedido...</p>
+  </div>
+
+  <!-- Estado de Error -->
+  <div class="error-state" *ngIf="error">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="goBack()">Volver</button>
+  </div>
+
+  <!-- Contenido de los Detalles del Pedido -->
+  <div class="order-content" *ngIf="!loading && !error && order">
+    <!-- Encabezado -->
+    <div class="details-header">
+      <button mat-icon-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>Detalles del Pedido</h1>
+    </div>
+
+    <!-- Tarjeta de Información del Pedido -->
+    <mat-card class="order-info-card">
+      <div class="order-header">
+        <div class="order-number">
+          <h2>Pedido #{{ order.order_id }}</h2>
+          <span class="status-badge" [ngClass]="getStatusClass(order.orderStatus)">
+            <mat-icon>{{ getStatusIcon(order.orderStatus) }}</mat-icon>
+            {{ order.orderStatus }}
+          </span>
+        </div>
+        <p class="order-date">Pedido realizado el {{ order.orderDate | date:'medium' }}</p>
+      </div>
+    </mat-card>
+
+    <!-- Contenido Principal -->
+    <div class="details-grid">
+      <!-- Productos del Pedido -->
+      <mat-card class="items-card">
+        <mat-card-header>
+          <mat-card-title>Productos del Pedido</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="items-list">
+            <div class="item" *ngFor="let item of order.orderItemList">
+              <div class="item-image">
+                <img [src]="item.sku.product.imageUrl" [alt]="item.sku.product.title">
+              </div>
+              <div class="item-details">
+                <h3>{{ item.sku.product.title }}</h3>
+                <p class="sku">SKU: {{ item.sku.skuCode }}</p>
+                <div class="price-qty">
+                  <span class="price">S/{{ item.discountedPrice }}</span>
+                  <span class="quantity">Cant.: {{ item.quantity }}</span>
+                </div>
+              </div>
+              <div class="item-total">
+                S/{{ item.discountedPrice * item.quantity }}
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Resumen del Pedido -->
+      <div class="summary-section">
+        <mat-card class="summary-card">
+          <mat-card-header>
+            <mat-card-title>Resumen del Pedido</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span>S/{{ order.totalDiscountedPrice }}</span>
+            </div>
+            <div class="summary-row">
+              <span>Envío</span>
+              <span>S/0.00</span>
+            </div>
+            <div class="summary-row">
+              <span>Impuesto</span>
+              <span>S/0.00</span>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="summary-row total">
+              <span>Total</span>
+              <span>S/{{ order.totalDiscountedPrice }}</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Dirección de Envío -->
+        <mat-card class="shipping-card">
+          <mat-card-header>
+            <mat-card-title>Dirección de Envío</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p class="name">{{ order.shippingAddress.firstName }}</p>
+            <p>{{ order.shippingAddress.streetAddress }}</p>
+            <p>{{ order.shippingAddress.city }}, {{ order.shippingAddress.state }}</p>
+            <p>{{ order.shippingAddress.zipCode }}</p>
+            <p>{{ order.shippingAddress.mobile }}</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>
